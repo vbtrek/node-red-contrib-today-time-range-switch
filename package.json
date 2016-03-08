@@ -17,5 +17,12 @@
     "nodes": {
       "time-range-switch": "index.js"
     }
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/biddster/node-red-contrib-time-range-switch.git"
+  },
+  "bugs": {
+    "url": "https://github.com/biddster/node-red-contrib-time-range-switch/issues"
   }
 }
