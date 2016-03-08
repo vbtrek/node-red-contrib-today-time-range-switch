@@ -1,0 +1,86 @@
+<!--
+The MIT License (MIT)
+
+Copyright (c) 2016 @biddster
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-->
+
+<script type="text/javascript">
+    RED.nodes.registerType('time-range-switch', {
+        category: 'function',
+        color: '#f37a33',
+        defaults: {
+            name: {value: ''},
+            lat: {value: ''},
+            lon: {value: ''},
+            startTime: {value: '07:28'},
+            endTime: {value: 'goldenHour'}
+        },
+        inputs: 1,
+        outputs: 2,
+        icon: 'switch.png',
+        label: function () {
+            return this.name || 'time-range-switch';
+        },
+        paletteLabel: 'time range',
+        align: 'left',
+        oneditprepare: function () {
+            if (!$("#node-input-lat").val().trim() && !$("#node-input-lon").val().trim()) {
+                if ('geolocation' in navigator) {
+                    navigator.geolocation.getCurrentPosition(function (position) {
+                        $("#node-input-lat").val(Number(position.coords.latitude.toFixed(5)));
+                        $("#node-input-lon").val(Number(position.coords.longitude.toFixed(5)));
+                    });
+                }
+            }
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="time-range-switch">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <hr>
+    <div class="form-row">
+		<label for="node-input-lat"><i class="fa fa-globe"></i> Latitude</label>
+		<input type="text" id="node-input-lat" placeholder="51.025">
+	</div>
+	<div class="form-row">
+		<label for="node-input-lon"><i class="fa fa-globe"></i> Longitude</label>
+		<input type="text" id="node-input-lon" placeholder="-1.4">
+	</div>
+
+	<hr>
+    <div class="form-row">
+        <label for="node-input-startTime"><i class="icon-tag"></i>Start time</label>
+        <input type="text" id="node-input-startTime" placeholder="">
+    </div>
+    <div class="form-row">
+        <label for="node-input-endTime"><i class="icon-tag"></i> End time</label>
+        <input type="text" id="node-input-endTime" placeholder="">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="time-range-switch">
+    <h1>time-range-switch</h1>
+    <p>Write me</p>
+</script>
