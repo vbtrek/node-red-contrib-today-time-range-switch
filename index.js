@@ -46,10 +46,10 @@ module.exports = function (RED) {
             }
             var range = moment.twix(start, end);
             if (range.contains(now)) {
-                node.log('Output 1');
+                node.log(now.format(fmt) + ' - output 1');
                 node.send([msg, null]);
             } else {
-                node.log('Output 2');
+                node.log(now.format(fmt) + ' - output 2');
                 node.send([null, msg]);
             }
             if (range.isPast()) {

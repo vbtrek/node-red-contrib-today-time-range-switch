@@ -74,8 +74,8 @@ var nodeRedModule = require('../index.js');
 describe('time-range-swithc', function () {
     it('should schedule initially', function () {
         var node = loadNode({
-            startTime: '23:45',
-            endTime: '13:45',
+            startTime: '12:45',
+            endTime: '02:45',
             lat: 51.33411,
             lon: -0.83716,
             unitTest: true
@@ -93,9 +93,8 @@ describe('time-range-swithc', function () {
             return time.clone();
         };
 
-        for (var i = 0; i < 48; ++i) {
+        for (var i = 0; i < (7 * 24); ++i) {
             time.add(1, 'hour');
-            console.log(time.toISOString());
             node.emit('input', {});
         }
 
