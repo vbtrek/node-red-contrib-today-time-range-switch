@@ -23,8 +23,7 @@
  */
 
 "use strict";
-var assert = require('chai').assert;
-var _ = require('lodash');
+var assert = require('assert');
 var moment = require('moment');
 
 function loadNode(config, redModule) {
@@ -71,22 +70,63 @@ function loadNode(config, redModule) {
 
 var nodeRedModule = require('../index.js');
 
+function runBetween(start, end) {
+    var node = loadNode({
+        startTime: start,
+        endTime: end,
+        lat: 51.33411,
+        lon: -0.83716,
+        unitTest: true
+    }, nodeRedModule);
 
-describe('schedex', function () {
-    it('should schedule initially', function () {
-        var node = loadNode({
-            on: '11:45',
-            onTopic: 'on',
-            onPayload: 'on payload',
-            off: '11:48',
-            offTopic: 'off',
-            offPayload: 'off payload',
-            lat: 51.33411,
-            lon: -0.83716,
-            unitTest: true
-        }, nodeRedModule);
+    var counts = {o1: 0, o2: 0};
+    node.send = function (msg) {
+        if (msg[0]) counts.o1++;
+        if (msg[1]) counts.o2++;
+    };
 
+    var time = moment('2016-01-01');
 
-        // assert.strictEqual(2881, node.messages().length);
+    node.now = function () {
+        return time.clone();
+    };
+
+    for (var i = 0; i < (7 * 24); ++i) {
+        time.add(1, 'hour');
+        node.emit('input', {});
+    }
+    return counts;
+}
+
+describe('time-range-switch', function () {
+    it('should work between 12:45...02:45', function () {
+        var counts = runBetween('12:45', '02:45');
+        assert.strictEqual(98, counts.o1);
+        assert.strictEqual(70, counts.o2);
+    });
+    it('should work between 01:45...02:45', function () {
+        var counts = runBetween('01:45', '02:45');
+        assert.strictEqual(7, counts.o1);
+        assert.strictEqual(161, counts.o2);
+    });
+    it('should work between 11:45...12:45', function () {
+        var counts = runBetween('11:45', '12:45');
+        assert.strictEqual(7, counts.o1);
+        assert.strictEqual(161, counts.o2);
+    });
+    it('should work between 22:45...01:45', function () {
+        var counts = runBetween('22:45', '01:45');
+        assert.strictEqual(21, counts.o1);
+        assert.strictEqual(147, counts.o2);
+    });
+    it('should work between 06:30...03:30', function () {
+        var counts = runBetween('06:30', '03:30');
+        assert.strictEqual(147, counts.o1);
+        assert.strictEqual(21, counts.o2);
+    });
+    it('should work between dawn...dusk', function () {
+        var counts = runBetween('dawn', 'dusk');
+        assert.strictEqual(63, counts.o1);
+        assert.strictEqual(105, counts.o2);
     });
 });
