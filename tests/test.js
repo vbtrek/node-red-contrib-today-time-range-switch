@@ -23,8 +23,7 @@
  */
 
 "use strict";
-var assert = require('chai').assert;
-var _ = require('lodash');
+var assert = require('assert');
 var moment = require('moment');
 
 function loadNode(config, redModule) {
@@ -72,20 +71,36 @@ function loadNode(config, redModule) {
 var nodeRedModule = require('../index.js');
 
 
-describe('schedex', function () {
+describe('time-range-swithc', function () {
     it('should schedule initially', function () {
         var node = loadNode({
-            on: '11:45',
-            onTopic: 'on',
-            onPayload: 'on payload',
-            off: '11:48',
-            offTopic: 'off',
-            offPayload: 'off payload',
+            startTime: '23:45',
+            endTime: '13:45',
             lat: 51.33411,
             lon: -0.83716,
             unitTest: true
         }, nodeRedModule);
 
+        var o1 = 0, o2 = 0;
+        node.send = function (msg) {
+            if (msg[0]) o1++;
+            if (msg[1]) o2++;
+        };
+
+        var time = moment('2016-01-01');
+
+        node.now = function () {
+            return time.clone();
+        };
+
+        for (var i = 0; i < 48; ++i) {
+            time.add(1, 'hour');
+            console.log(time.toISOString());
+            node.emit('input', {});
+        }
+
+        console.log(o1);
+        console.log(o2);
 
         // assert.strictEqual(2881, node.messages().length);
     });

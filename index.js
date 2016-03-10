@@ -38,14 +38,23 @@ module.exports = function (RED) {
         node.on('input', function (msg) {
             var start = momentFor(config.startTime);
             var end = momentFor(config.endTime);
-            if (start.isAfter(end)) {
+            var now = node.now();
+            if (now.isAfter(start) && end.isBefore(start)) {
+                end.add(1, 'day');
+            } else if (now.isBefore(end) && start.isAfter(end)) {
                 start.subtract(1, 'day');
             }
             var range = moment.twix(start, end);
-            if (range.isCurrent()) {
+            if (range.contains(now)) {
+                node.log('Output 1');
                 node.send([msg, null]);
             } else {
+                node.log('Output 2');
                 node.send([null, msg]);
+            }
+            if (range.isPast()) {
+                // start.add(1, 'day');
+                // end.add(1, 'day');
             }
             node.status({
                 text: ' START ' + start.format(fmt) + ' END ' + end.format(fmt)
@@ -55,7 +64,7 @@ module.exports = function (RED) {
         function momentFor(time) {
             var m, matches = new RegExp(/(\d+):(\d+)/).exec(time);
             if (matches && matches.length) {
-                m = moment().hour(matches[1]).minute(matches[2]);
+                m = node.now().hour(matches[1]).minute(matches[2]);
             } else {
                 var sunCalcTimes = SunCalc.getTimes(new Date(), config.lat, config.lon);
                 var date = sunCalcTimes[time];
@@ -69,6 +78,10 @@ module.exports = function (RED) {
                 node.status({fill: 'red', shape: 'dot', text: 'Invalid time: ' + time});
             }
             return m;
+        }
+
+        this.now = function() {
+            return moment();
         }
     });
 };
