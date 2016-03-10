@@ -36,37 +36,34 @@ module.exports = function (RED) {
         node.log(JSON.stringify(config, null, 4));
 
         node.on('input', function (msg) {
-            var start = momentFor(config.startTime);
-            var end = momentFor(config.endTime);
             var now = node.now();
-            if (now.isAfter(start) && end.isBefore(start)) {
+            var start = momentFor(config.startTime, now);
+            var end = momentFor(config.endTime, now);
+            // TODO - this doesn't always show the correct range. e.g. same day and on 01:00 and off 02:00.
+            // Ideally it would show tomorrow's range.
+            if (now.isAfter(end) && end.isBefore(start)) {
                 end.add(1, 'day');
             } else if (now.isBefore(end) && start.isAfter(end)) {
                 start.subtract(1, 'day');
             }
             var range = moment.twix(start, end);
-            if (range.contains(now)) {
-                node.log(now.format(fmt) + ' - output 1');
-                node.send([msg, null]);
-            } else {
-                node.log(now.format(fmt) + ' - output 2');
-                node.send([null, msg]);
-            }
-            if (range.isPast()) {
-                // start.add(1, 'day');
-                // end.add(1, 'day');
-            }
+            // node.log('isValid: ' + range.isValid());
+            var output = range.contains(now) ? 1 : 2;
+            var msgs = [];
+            msgs[output - 1] = msg;
+            node.send(msgs);
+            node.log('now [' + now.format(fmt) + '] range [' + range.simpleFormat(fmt) + '] => ' + output);
             node.status({
-                text: ' START ' + start.format(fmt) + ' END ' + end.format(fmt)
+                text: 'Msg => ' + output
             });
         });
 
-        function momentFor(time) {
+        function momentFor(time, now) {
             var m, matches = new RegExp(/(\d+):(\d+)/).exec(time);
             if (matches && matches.length) {
-                m = node.now().hour(matches[1]).minute(matches[2]);
+                m = now.clone().hour(matches[1]).minute(matches[2]);
             } else {
-                var sunCalcTimes = SunCalc.getTimes(new Date(), config.lat, config.lon);
+                var sunCalcTimes = SunCalc.getTimes(now.toDate(), config.lat, config.lon);
                 var date = sunCalcTimes[time];
                 if (date) {
                     m = moment(date);
@@ -80,7 +77,7 @@ module.exports = function (RED) {
             return m;
         }
 
-        this.now = function() {
+        node.now = function () {
             return moment();
         }
     });
