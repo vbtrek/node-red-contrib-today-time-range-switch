@@ -54,7 +54,9 @@ module.exports = function (RED) {
             node.send(msgs);
             node.log('now [' + now.format(fmt) + '] range [' + range.simpleFormat(fmt) + '] => ' + output);
             node.status({
-                text: 'Msg => ' + output
+                fill: 'green',
+                shape: output === 1 ? 'dot' : 'ring',
+                text: range.simpleFormat(fmt)
             });
         });
 
