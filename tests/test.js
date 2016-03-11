@@ -99,6 +99,9 @@ function runBetween(start, end) {
 }
 
 describe('time-range-switch', function () {
+
+    // TODO - all these tests should assert the actual times rather than just the counts.
+
     it('should work between 12:45...02:45', function () {
         var counts = runBetween('12:45', '02:45');
         assert.strictEqual(98, counts.o1);
@@ -128,5 +131,10 @@ describe('time-range-switch', function () {
         var counts = runBetween('dawn', 'dusk');
         assert.strictEqual(63, counts.o1);
         assert.strictEqual(105, counts.o2);
+    });
+    it('should work between goldenHour...dawn', function () {
+        var counts = runBetween('goldenHour', 'dawn');
+        assert.strictEqual(112, counts.o1);
+        assert.strictEqual(56, counts.o2);
     });
 });
