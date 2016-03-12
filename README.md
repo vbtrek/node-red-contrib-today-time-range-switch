@@ -15,7 +15,7 @@ Change directory to your node red installation:
 The times can be a 24 hour time or a [suncalc](https://github.com/mourner/suncalc) event:
 
 
-| Property        | Description                                                              |
+| Time        | Description                                                              |
 | --------------- | ------------------------------------------------------------------------ |
 | `00:00 ... 23:59`       | 24hr time                     |
 | `sunrise`       | sunrise (top edge of the sun appears on the horizon)                     |
