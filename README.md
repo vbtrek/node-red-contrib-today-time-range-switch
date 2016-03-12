@@ -1,10 +1,10 @@
 # node-red-contrib-time-range-switch
 
  ## Time Range Switch
-    A simple node that routes input messages depending on the time. If the current time falls within the range specified
-    in the node configuration, the message is routed to output 1. Otherwise the message is routed to output 2.
+A simple node that routes input messages depending on the time. If the current time falls within the range specified
+in the node configuration, the message is routed to output 1. Otherwise the message is routed to output 2.
     
-    The times can be a 24 hour time or a [suncalc](https://github.com/mourner/suncalc) event:
+The times can be a 24 hour time or a [suncalc](https://github.com/mourner/suncalc) event:
 
 
 | Property        | Description                                                              |
