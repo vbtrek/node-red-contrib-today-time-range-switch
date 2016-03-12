@@ -1,6 +1,6 @@
 ## Time Range Switch
 
-A simple Node-RED node that routes input messages depending on the time. If the current time falls within the range specified
+A simple Node-RED node that routes messages depending on the time. If the current time falls within the range specified
 in the node configuration, the message is routed to output 1. Otherwise the message is routed to output 2.
 
 
