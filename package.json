@@ -3,7 +3,7 @@
   "version": "0.3.3",
   "description": "",
   "main": "index.js",
-  "keywords": [ "node-red", "router", "switch", "time" ],
+  "keywords": [ "node-red", "router", "switch", "time", "sun events" ],
   "scripts": {
     "test": "mocha -R spec ./tests/test.js"
   },
