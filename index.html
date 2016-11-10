@@ -37,7 +37,7 @@ THE SOFTWARE.
         outputs: 2,
         icon: 'switch.png',
         label: function () {
-            return this.name || 'time-range-switch';
+            return this.name || this.startTime + ' - ' + this.endTime;
         },
         paletteLabel: 'time range',
         align: 'left',

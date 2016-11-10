@@ -25,59 +25,17 @@
 "use strict";
 var assert = require('assert');
 var moment = require('moment');
-
-function loadNode(config, redModule) {
-    var _events = [], _status = undefined, _error = undefined, _messages = [];
-    var RED = {
-        nodes: {
-            registerType: function (nodeName, nodeConfigFunc) {
-                this.nodeConfigFunc = nodeConfigFunc;
-            },
-            createNode: function () {
-            }
-        },
-        on: function (event, eventFunc) {
-            _events[event] = eventFunc;
-        },
-        emit: function (event, data) {
-            _events[event](data);
-        },
-        error: function (error) {
-            if (error) _error = error;
-            return _error;
-        },
-        status: function (status) {
-            if (status) _status = status;
-            return _status;
-        },
-        log: function () {
-            console.log.apply(this, arguments);
-        },
-        send: function (msg) {
-            assert(msg);
-            _messages.push(msg);
-        },
-        messages: function (messages) {
-            if (messages) _messages = messages;
-            return _messages;
-        }
-    };
-    redModule(RED);
-    RED.nodes.nodeConfigFunc.call(RED, config);
-    return RED;
-}
-
-
+var mock = require('node-red-contrib-mock-node');
 var nodeRedModule = require('../index.js');
 
 function runBetween(start, end) {
-    var node = loadNode({
+    var node = mock(nodeRedModule, {
         startTime: start,
         endTime: end,
         lat: 51.33411,
         lon: -0.83716,
         unitTest: true
-    }, nodeRedModule);
+    });
 
     var counts = {o1: 0, o2: 0};
     node.send = function (msg) {

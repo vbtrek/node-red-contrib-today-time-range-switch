@@ -33,7 +33,6 @@ module.exports = function (RED) {
     RED.nodes.registerType('time-range-switch', function (config) {
         RED.nodes.createNode(this, config);
         var node = this;
-        node.log(JSON.stringify(config, null, 4));
 
         node.on('input', function (msg) {
             var now = node.now();
@@ -47,12 +46,10 @@ module.exports = function (RED) {
                 start.subtract(1, 'day');
             }
             var range = moment.twix(start, end);
-            // node.log('isValid: ' + range.isValid());
             var output = range.contains(now) ? 1 : 2;
             var msgs = [];
             msgs[output - 1] = msg;
             node.send(msgs);
-            node.log('now [' + now.format(fmt) + '] range [' + range.simpleFormat(fmt) + '] => ' + output);
             node.status({
                 fill: 'green',
                 shape: output === 1 ? 'dot' : 'ring',
