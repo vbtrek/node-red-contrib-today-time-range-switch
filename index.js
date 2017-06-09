@@ -71,13 +71,13 @@ module.exports = function (RED) {
             if (m) {
                 m.seconds(0);
             } else {
-                node.status({fill: 'red', shape: 'dot', text: 'Invalid time: ' + time});
+                node.status({ fill: 'red', shape: 'dot', text: 'Invalid time: ' + time });
             }
             return m;
         }
 
         node.now = function () {
             return moment();
-        }
+        };
     });
 };

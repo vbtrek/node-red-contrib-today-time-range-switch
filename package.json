@@ -33,6 +33,17 @@
     "url": "https://github.com/biddster/node-red-contrib-time-range-switch/issues"
   },
   "devDependencies": {
+    "eslint": "^3.19.0",
+    "eslint-config-biddster": "^0.3.0",
+    "mocha": "^3.4.2",
     "node-red-contrib-mock-node": "^0.2.0"
+  },
+  "eslintConfig": {
+    "env": {
+      "es6": true,
+      "node": true,
+      "mocha": true
+    },
+    "extends": "eslint-config-biddster/es6-node"
   }
 }
