@@ -32,3 +32,9 @@ The times can be a 24 hour time or a [suncalc](https://github.com/mourner/suncal
 | `nightEnd`      | night ends (morning astronomical twilight starts)                        |
 | `nauticalDawn`  | nautical dawn (morning nautical twilight starts)                         |
 | `dawn`          | dawn (morning nautical twilight ends, morning civil twilight starts)     |
+
+### Offsets
+
+The start and end time can have an offset. This is specified in minutes:
+- -ve number brings the time forward. E.g. if the time is dusk and offset is -60, the start time will be 60 minutes before dusk.
+- +ve number delays the time by the specified number of minutes

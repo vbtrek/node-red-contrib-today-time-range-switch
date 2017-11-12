@@ -22,7 +22,7 @@
  THE SOFTWARE.
  */
 
-module.exports = function (RED) {
+module.exports = function(RED) {
     'use strict';
 
     var SunCalc = require('suncalc');
@@ -30,11 +30,11 @@ module.exports = function (RED) {
     require('twix');
     var fmt = 'YYYY-MM-DD HH:mm';
 
-    RED.nodes.registerType('time-range-switch', function (config) {
+    RED.nodes.registerType('time-range-switch', function(config) {
         RED.nodes.createNode(this, config);
         var node = this;
 
-        node.on('input', function (msg) {
+        node.on('input', function(msg) {
             var now = node.now();
             var start = momentFor(config.startTime, now);
             var end = momentFor(config.endTime, now);
@@ -44,6 +44,12 @@ module.exports = function (RED) {
                 end.add(1, 'day');
             } else if (now.isBefore(end) && start.isAfter(end)) {
                 start.subtract(1, 'day');
+            }
+            if (config.startOffset) {
+                start.add(config.startOffset, 'minutes');
+            }
+            if (config.endOffset) {
+                end.add(config.endOffset, 'minutes');
             }
             var range = moment.twix(start, end);
             var output = range.contains(now) ? 1 : 2;
@@ -58,9 +64,13 @@ module.exports = function (RED) {
         });
 
         function momentFor(time, now) {
-            var m, matches = new RegExp(/(\d+):(\d+)/).exec(time);
+            var m,
+                matches = new RegExp(/(\d+):(\d+)/).exec(time);
             if (matches && matches.length) {
-                m = now.clone().hour(matches[1]).minute(matches[2]);
+                m = now
+                    .clone()
+                    .hour(matches[1])
+                    .minute(matches[2]);
             } else {
                 var sunCalcTimes = SunCalc.getTimes(now.toDate(), config.lat, config.lon);
                 var date = sunCalcTimes[time];
@@ -68,6 +78,7 @@ module.exports = function (RED) {
                     m = moment(date);
                 }
             }
+
             if (m) {
                 m.seconds(0);
             } else {
@@ -76,7 +87,7 @@ module.exports = function (RED) {
             return m;
         }
 
-        node.now = function () {
+        node.now = function() {
             return moment();
         };
     });
