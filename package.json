@@ -1,15 +1,9 @@
 {
     "name": "node-red-contrib-time-range-switch",
-    "version": "0.5.1",
+    "version": "0.6.0",
     "description": "",
     "main": "index.js",
-    "keywords": [
-        "node-red",
-        "router",
-        "switch",
-        "time",
-        "sun events"
-    ],
+    "keywords": ["node-red", "router", "switch", "time", "sun events"],
     "scripts": {
         "test": "nyc --reporter=html mocha -R spec ./tests/test.js"
     },
@@ -51,10 +45,7 @@
             "ecmaVersion": 6,
             "sourceType": "module"
         },
-        "extends": [
-            "eslint-config-biddster/es6-node",
-            "prettier"
-        ]
+        "extends": ["eslint-config-biddster/es6-node", "prettier"]
     },
     "prettier": {
         "singleQuote": true,
