@@ -3,16 +3,22 @@
     "version": "0.5.1",
     "description": "",
     "main": "index.js",
-    "keywords": ["node-red", "router", "switch", "time", "sun events"],
+    "keywords": [
+        "node-red",
+        "router",
+        "switch",
+        "time",
+        "sun events"
+    ],
     "scripts": {
         "test": "nyc --reporter=html mocha -R spec ./tests/test.js"
     },
     "author": "@biddster",
     "license": "MIT",
     "dependencies": {
-        "moment": "^2.12.0",
-        "suncalc": "^1.7.0",
-        "twix": "^0.9.0"
+        "moment": "^2.22.2",
+        "suncalc": "^1.8.0",
+        "twix": "^1.2.1"
     },
     "node-red": {
         "nodes": {
@@ -27,13 +33,13 @@
         "url": "https://github.com/biddster/node-red-contrib-time-range-switch/issues"
     },
     "devDependencies": {
-        "eslint": "^3.19.0",
-        "eslint-config-biddster": "^0.3.0",
-        "eslint-config-prettier": "^2.4.0",
-        "mocha": "^3.4.2",
-        "node-red-contrib-mock-node": "^0.2.0",
-        "nyc": "^11.3.0",
-        "prettier": "^1.7.0"
+        "eslint": "^5.1.0",
+        "eslint-config-biddster": "^0.6.0",
+        "eslint-config-prettier": "^2.9.0",
+        "mocha": "^5.2.0",
+        "node-red-contrib-mock-node": "^0.4.0",
+        "nyc": "^12.0.2",
+        "prettier": "^1.13.7"
     },
     "eslintConfig": {
         "env": {
@@ -45,7 +51,10 @@
             "ecmaVersion": 6,
             "sourceType": "module"
         },
-        "extends": ["eslint-config-biddster/es6-node", "prettier"]
+        "extends": [
+            "eslint-config-biddster/es6-node",
+            "prettier"
+        ]
     },
     "prettier": {
         "singleQuote": true,
