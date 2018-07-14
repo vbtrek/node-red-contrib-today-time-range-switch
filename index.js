@@ -25,35 +25,49 @@
 module.exports = function(RED) {
     'use strict';
 
-    var SunCalc = require('suncalc');
-    var moment = require('moment');
+    const SunCalc = require('suncalc');
+    const moment = require('moment');
     require('twix');
-    var fmt = 'YYYY-MM-DD HH:mm';
+    const fmt = 'YYYY-MM-DD HH:mm';
 
     RED.nodes.registerType('time-range-switch', function(config) {
         RED.nodes.createNode(this, config);
-        var node = this;
+        const node = this;
 
         node.on('input', function(msg) {
-            var now = node.now();
-            var start = momentFor(config.startTime, now);
-            var end = momentFor(config.endTime, now);
-            // TODO - this doesn't always show the correct range. e.g. same day and on 01:00 and off 02:00.
-            // Ideally it would show tomorrow's range.
-            if (now.isAfter(end) && end.isBefore(start)) {
-                end.add(1, 'day');
-            } else if (now.isBefore(end) && start.isAfter(end)) {
-                start.subtract(1, 'day');
-            }
+            const now = node.now();
+            const start = momentFor(config.startTime, now);
             if (config.startOffset) {
                 start.add(config.startOffset, 'minutes');
             }
+            const end = momentFor(config.endTime, now);
             if (config.endOffset) {
                 end.add(config.endOffset, 'minutes');
             }
-            var range = moment.twix(start, end);
-            var output = range.contains(now) ? 1 : 2;
-            var msgs = [];
+            // align end to be before AND within 24 hours of start
+            while (end.diff(start, 'seconds') < 0) {
+                // end before start
+                end.add(1, 'day');
+            }
+            while (end.diff(start, 'seconds') > 86400) {
+                // end more than day before start
+                end.subtract(1, 'day');
+            }
+            // move start and end window to be within a day of now
+            while (end.diff(now, 'seconds') < 0) {
+                // end before now
+                start.add(1, 'day');
+                end.add(1, 'day');
+            }
+            while (end.diff(now, 'seconds') > 86400) {
+                // end more than day from now
+                start.subtract(1, 'day');
+                end.subtract(1, 'day');
+            }
+
+            const range = moment.twix(start, end);
+            const output = range.contains(now) ? 1 : 2;
+            const msgs = [];
             msgs[output - 1] = msg;
             node.send(msgs);
             node.status({
@@ -64,16 +78,16 @@ module.exports = function(RED) {
         });
 
         function momentFor(time, now) {
-            var m,
-                matches = new RegExp(/(\d+):(\d+)/).exec(time);
+            let m = null;
+            const matches = new RegExp(/(\d+):(\d+)/).exec(time);
             if (matches && matches.length) {
                 m = now
                     .clone()
                     .hour(matches[1])
                     .minute(matches[2]);
             } else {
-                var sunCalcTimes = SunCalc.getTimes(now.toDate(), config.lat, config.lon);
-                var date = sunCalcTimes[time];
+                const sunCalcTimes = SunCalc.getTimes(now.toDate(), config.lat, config.lon);
+                const date = sunCalcTimes[time];
                 if (date) {
                     m = moment(date);
                 }
