@@ -37,20 +37,30 @@ module.exports = function(RED) {
         node.on('input', function(msg) {
             var now = node.now();
             var start = momentFor(config.startTime, now);
-            var end = momentFor(config.endTime, now);
-            // TODO - this doesn't always show the correct range. e.g. same day and on 01:00 and off 02:00.
-            // Ideally it would show tomorrow's range.
-            if (now.isAfter(end) && end.isBefore(start)) {
-                end.add(1, 'day');
-            } else if (now.isBefore(end) && start.isAfter(end)) {
-                start.subtract(1, 'day');
-            }
             if (config.startOffset) {
                 start.add(config.startOffset, 'minutes');
             }
+            var end = momentFor(config.endTime, now);
             if (config.endOffset) {
                 end.add(config.endOffset, 'minutes');
             }
+            // align end to be before AND within 24 hours of start 
+            while(end.diff(start, 'seconds') < 0) { // end before start
+                end.add(1, 'day');
+            }
+            while(end.diff(start, 'seconds') > 86400) { // end more than day before start
+                end.subtract(1, 'day');
+            }   
+            // move start and end window to be within a day of now
+            while(end.diff(now, 'seconds') < 0) { // end before now
+                start.add(1, 'day');
+                end.add(1, 'day');
+            }
+            while(end.diff(now, 'seconds') > 86400) { // end more than day from now
+                start.subtract(1, 'day');
+                end.subtract(1, 'day');
+            }   
+
             var range = moment.twix(start, end);
             var output = range.contains(now) ? 1 : 2;
             var msgs = [];
