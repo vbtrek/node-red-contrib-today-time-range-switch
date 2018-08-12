@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /**
  The MIT License (MIT)
 
@@ -32,10 +33,9 @@ module.exports = function(RED) {
 
     RED.nodes.registerType('time-range-switch', function(config) {
         RED.nodes.createNode(this, config);
-        const node = this;
 
-        node.on('input', function(msg) {
-            const now = node.now();
+        this.on('input', msg => {
+            const now = this.now();
             const start = momentFor(config.startTime, now);
             if (config.startOffset) {
                 start.add(config.startOffset, 'minutes');
@@ -69,15 +69,15 @@ module.exports = function(RED) {
             const output = range.contains(now) ? 1 : 2;
             const msgs = [];
             msgs[output - 1] = msg;
-            node.send(msgs);
-            node.status({
+            this.send(msgs);
+            this.status({
                 fill: 'green',
                 shape: output === 1 ? 'dot' : 'ring',
                 text: range.simpleFormat(fmt)
             });
         });
 
-        function momentFor(time, now) {
+        const momentFor = (time, now) => {
             let m = null;
             const matches = new RegExp(/(\d+):(\d+)/).exec(time);
             if (matches && matches.length) {
@@ -96,12 +96,12 @@ module.exports = function(RED) {
             if (m) {
                 m.seconds(0);
             } else {
-                node.status({ fill: 'red', shape: 'dot', text: 'Invalid time: ' + time });
+                this.status({ fill: 'red', shape: 'dot', text: `Invalid time: ${time}` });
             }
             return m;
-        }
+        };
 
-        node.now = function() {
+        this.now = function() {
             return moment();
         };
     });
