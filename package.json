@@ -1,6 +1,6 @@
 {
     "name": "node-red-contrib-time-range-switch",
-    "version": "0.6.1",
+    "version": "0.6.2",
     "description": "",
     "main": "index.js",
     "keywords": [
@@ -16,9 +16,9 @@
     "author": "@biddster",
     "license": "MIT",
     "dependencies": {
-        "moment": "^2.12.0",
-        "suncalc": "^1.7.0",
-        "twix": "^0.9.0"
+        "moment": "^2.24.0",
+        "suncalc": "^1.8.0",
+        "twix": "0.9.0"
     },
     "node-red": {
         "nodes": {
@@ -33,13 +33,14 @@
         "url": "https://github.com/biddster/node-red-contrib-time-range-switch/issues"
     },
     "devDependencies": {
-        "eslint": "^5.1.0",
-        "eslint-config-biddster": "^0.6.0",
-        "eslint-config-prettier": "^2.9.0",
+        "eslint": "^5.13.0",
+        "eslint-config-airbnb-base": "^13.1.0",
+        "eslint-config-prettier": "^4.0.0",
+        "eslint-plugin-import": "^2.16.0",
         "mocha": "^5.2.0",
         "node-red-contrib-mock-node": "^0.4.0",
-        "nyc": "^12.0.2",
-        "prettier": "^1.13.7"
+        "nyc": "^13.1.0",
+        "prettier": "^1.16.3"
     },
     "eslintConfig": {
         "env": {
@@ -47,13 +48,24 @@
             "node": true,
             "mocha": true
         },
-        "parserOptions": {
-            "ecmaVersion": 6,
-            "sourceType": "module"
-        },
         "extends": [
-            "eslint-config-biddster/es6-node",
+            "airbnb-base",
             "prettier"
+        ],
+        "overrides": [
+            {
+                "files": [
+                    "*.js"
+                ],
+                "rules": {
+                    "func-names": "off",
+                    "max-lines-per-function": "off",
+                    "global-require": "off",
+                    "no-plusplus": "off",
+                    "no-param-reassign": "off",
+                    "no-multi-assign": "off"
+                }
+            }
         ]
     },
     "prettier": {
