@@ -11,6 +11,7 @@
         "sun events"
     ],
     "scripts": {
+        "start": "mkdir -p .node-red/node_modules && ln -sf $PWD $PWD/.node-red/node_modules/node-red-contrib-schedex && node-red -u .node-red",
         "test": "nyc --reporter=html mocha -R spec ./tests/test.js"
     },
     "author": "@biddster",
@@ -18,7 +19,7 @@
     "dependencies": {
         "moment": "^2.24.0",
         "moment-range": "^4.0.2",
-        "suncalc": "^1.8.0"
+        "suncalc2": "^1.8.1"
     },
     "node-red": {
         "nodes": {
@@ -33,14 +34,14 @@
         "url": "https://github.com/biddster/node-red-contrib-time-range-switch/issues"
     },
     "devDependencies": {
-        "eslint": "^6.3.0",
+        "eslint": "^6.8.0",
         "eslint-config-airbnb-base": "^14.0.0",
-        "eslint-config-prettier": "^6.3.0",
-        "eslint-plugin-import": "^2.18.2",
-        "mocha": "^6.2.0",
+        "eslint-config-prettier": "^6.9.0",
+        "eslint-plugin-import": "^2.19.1",
+        "mocha": "^7.0.0",
         "node-red-contrib-mock-node": "^0.4.0",
-        "nyc": "^14.1.1",
-        "prettier": "^1.18.2"
+        "nyc": "^15.0.0",
+        "prettier": "^1.19.1"
     },
     "eslintConfig": {
         "env": {
