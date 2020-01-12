@@ -117,4 +117,64 @@ describe('time-range-switch', function() {
         assert.strictEqual(154, counts.o2);
         assert.strictEqual(counts.status.text, '2016-01-07 22:45 - 2016-01-08 00:59');
     });
+    it('issue 26', function() {
+        const invocations = [
+            ['2019-10-23 19:29:25', 2],
+            ['2019-10-23 20:29:25', 2],
+            ['2019-10-23 21:29:25', 2],
+            ['2019-10-23 22:29:25', 1],
+            ['2019-10-23 23:29:25', 1],
+            ['2019-10-24 00:29:25', 1],
+            ['2019-10-24 01:29:25', 1],
+            ['2019-10-24 02:29:25', 1],
+            ['2019-10-24 03:29:25', 1],
+            ['2019-10-24 04:29:25', 1],
+            ['2019-10-24 05:29:25', 1],
+            ['2019-10-24 06:29:25', 2],
+            ['2019-10-24 07:29:25', 2],
+            ['2019-10-24 08:29:25', 2],
+            ['2019-10-24 09:29:25', 2],
+            ['2019-10-24 10:29:25', 2],
+            ['2019-10-24 11:29:25', 2],
+            ['2019-10-24 12:29:25', 2],
+            ['2019-10-24 13:29:25', 2],
+            ['2019-10-24 14:29:25', 2],
+            ['2019-10-24 15:29:25', 2],
+            ['2019-10-24 16:29:25', 2],
+            ['2019-10-24 17:29:25', 2],
+            ['2019-10-24 18:29:25', 2]
+        ];
+
+        const node = mock(nodeRedModule, {
+            startTime: '22:00',
+            endTime: '06:00',
+            lat: 48.2205998,
+            lon: 16.239978,
+            unitTest: true
+        });
+
+        function findOutput(msgs) {
+            if (msgs[0]) {
+                return 1;
+            }
+            if (msgs[1]) {
+                return 2;
+            }
+            throw new Error('No output');
+        }
+
+        invocations.forEach(function(invocation, i) {
+            const time = moment(invocation[0]);
+
+            node.now = function() {
+                return time.clone();
+            };
+
+            node.emit('input', { payload: 'fire' });
+            const msgs = node.sent(i);
+            const output = findOutput(msgs);
+            // console.log(time.toString() + ', output ' + output);
+            assert.strictEqual(invocation[1], output);
+        });
+    });
 });
