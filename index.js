@@ -24,15 +24,37 @@
  */
 
 module.exports = function(RED) {
-    'use strict';
-
-    const SunCalc = require('suncalc');
+    const SunCalc = require('suncalc2');
     const MomentRange = require('moment-range');
     const moment = MomentRange.extendMoment(require('moment'));
     const fmt = 'YYYY-MM-DD HH:mm';
 
     RED.nodes.registerType('time-range-switch', function(config) {
         RED.nodes.createNode(this, config);
+
+        const momentFor = (time, now) => {
+            let m = null;
+            const matches = new RegExp(/(\d+):(\d+)/).exec(time);
+            if (matches && matches.length) {
+                m = now
+                    .clone()
+                    .hour(matches[1])
+                    .minute(matches[2]);
+            } else {
+                const sunCalcTimes = SunCalc.getTimes(now.toDate(), config.lat, config.lon);
+                const date = sunCalcTimes[time];
+                if (date) {
+                    m = moment(date);
+                }
+            }
+
+            if (m) {
+                m.seconds(0);
+            } else {
+                this.status({ fill: 'red', shape: 'dot', text: `Invalid time: ${time}` });
+            }
+            return m;
+        };
 
         this.on('input', msg => {
             const now = this.now();
@@ -76,30 +98,6 @@ module.exports = function(RED) {
                 text: `${start.format(fmt)} - ${end.format(fmt)}`
             });
         });
-
-        const momentFor = (time, now) => {
-            let m = null;
-            const matches = new RegExp(/(\d+):(\d+)/).exec(time);
-            if (matches && matches.length) {
-                m = now
-                    .clone()
-                    .hour(matches[1])
-                    .minute(matches[2]);
-            } else {
-                const sunCalcTimes = SunCalc.getTimes(now.toDate(), config.lat, config.lon);
-                const date = sunCalcTimes[time];
-                if (date) {
-                    m = moment(date);
-                }
-            }
-
-            if (m) {
-                m.seconds(0);
-            } else {
-                this.status({ fill: 'red', shape: 'dot', text: `Invalid time: ${time}` });
-            }
-            return m;
-        };
 
         this.now = function() {
             return moment();
