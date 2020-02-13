@@ -22,8 +22,6 @@
  THE SOFTWARE.
  */
 
-'use strict';
-
 const assert = require('assert');
 const moment = require('moment');
 const mock = require('node-red-contrib-mock-node');
@@ -97,13 +95,13 @@ describe('time-range-switch', function() {
         const counts = runBetween('dawn', 'dusk');
         assert.strictEqual(63, counts.o1);
         assert.strictEqual(105, counts.o2);
-        assert.strictEqual(counts.status.text, '2016-01-08 07:28 - 2016-01-08 16:52');
+        assert.strictEqual(counts.status.text, '2016-01-08 07:28 - 2016-01-08 16:53');
     });
     it('should work between goldenHour...dawn', function() {
         const counts = runBetween('goldenHour', 'dawn');
         assert.strictEqual(112, counts.o1);
         assert.strictEqual(56, counts.o2);
-        assert.strictEqual(counts.status.text, '2016-01-07 15:13 - 2016-01-08 07:28');
+        assert.strictEqual(counts.status.text, '2016-01-07 15:15 - 2016-01-08 07:28');
     });
     it('should work between 22:45...01:45 with a start offset of 16', function() {
         const counts = runBetween('22:45', '01:45', 16);
