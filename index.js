@@ -24,9 +24,7 @@
  */
 
 module.exports = function(RED) {
-    'use strict';
-
-    const SunCalc = require('suncalc');
+    const SunCalc = require('suncalc2');
     const MomentRange = require('moment-range');
     const moment = MomentRange.extendMoment(require('moment'));
     const fmt = 'YYYY-MM-DD HH:mm';
@@ -34,8 +32,48 @@ module.exports = function(RED) {
     RED.nodes.registerType('time-range-switch', function(config) {
         RED.nodes.createNode(this, config);
 
+        const momentFor = (time, now) => {
+            let m = null;
+            const matches = new RegExp(/(\d+):(\d+)/).exec(time);
+            if (matches && matches.length) {
+                m = now
+                    .clone()
+                    .hour(matches[1])
+                    .minute(matches[2])
+                    .second(0);
+            } else {
+                // Schedex#57 Suncalc appears to give the best results if you
+                // calculate at midday.
+                const sunDate = now
+                    .clone()
+                    .hour(12)
+                    .minute(0)
+                    .second(0)
+                    .toDate();
+                const sunCalcTimes = SunCalc.getTimes(sunDate, config.lat, config.lon);
+                const sunTime = sunCalcTimes[time];
+                if (sunTime) {
+                    // Schedex#57 Nadir appears to work differently to other sun times
+                    // in that it will calculate tomorrow's nadir if the time is
+                    // too close to today's nadir. So we just take the time and
+                    // apply that to the event's moment. That's doesn't yield a
+                    // perfect suntime but it's close enough.
+                    m = now
+                        .clone()
+                        .hour(sunTime.getHours())
+                        .minute(sunTime.getMinutes())
+                        .second(sunTime.getSeconds());
+                }
+            }
+
+            if (!m) {
+                this.status({ fill: 'red', shape: 'dot', text: `Invalid time: ${time}` });
+            }
+            return m;
+        };
+
         this.on('input', msg => {
-            const now = this.now();
+            const now = this.now().milliseconds(0);
             const start = momentFor(config.startTime, now);
             if (config.startOffset) {
                 start.add(config.startOffset, 'minutes');
@@ -76,30 +114,6 @@ module.exports = function(RED) {
                 text: `${start.format(fmt)} - ${end.format(fmt)}`
             });
         });
-
-        const momentFor = (time, now) => {
-            let m = null;
-            const matches = new RegExp(/(\d+):(\d+)/).exec(time);
-            if (matches && matches.length) {
-                m = now
-                    .clone()
-                    .hour(matches[1])
-                    .minute(matches[2]);
-            } else {
-                const sunCalcTimes = SunCalc.getTimes(now.toDate(), config.lat, config.lon);
-                const date = sunCalcTimes[time];
-                if (date) {
-                    m = moment(date);
-                }
-            }
-
-            if (m) {
-                m.seconds(0);
-            } else {
-                this.status({ fill: 'red', shape: 'dot', text: `Invalid time: ${time}` });
-            }
-            return m;
-        };
 
         this.now = function() {
             return moment();
