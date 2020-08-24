@@ -1,7 +1,6 @@
 /* eslint-disable prefer-arrow-callback */
 /* eslint-disable no-undef */
 /* eslint-disable func-style */
-'use strict';
 /**
  The MIT License (MIT)
 
