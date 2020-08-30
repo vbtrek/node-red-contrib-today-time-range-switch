@@ -23,33 +23,25 @@
  THE SOFTWARE.
  */
 
-module.exports = function(RED) {
+module.exports = function (RED) {
     const SunCalc = require('suncalc2');
     const MomentRange = require('moment-range');
-    const moment = MomentRange.extendMoment(require('moment'));
+
+    const Moment = MomentRange.extendMoment(require('moment'));
     const fmt = 'YYYY-MM-DD HH:mm';
 
-    RED.nodes.registerType('time-range-switch', function(config) {
+    RED.nodes.registerType('time-range-switch', function (config) {
         RED.nodes.createNode(this, config);
 
         const momentFor = (time, now) => {
             let m = null;
             const matches = new RegExp(/(\d+):(\d+)/).exec(time);
             if (matches && matches.length) {
-                m = now
-                    .clone()
-                    .hour(matches[1])
-                    .minute(matches[2])
-                    .second(0);
+                m = now.clone().hour(matches[1]).minute(matches[2]).second(0);
             } else {
                 // Schedex#57 Suncalc appears to give the best results if you
                 // calculate at midday.
-                const sunDate = now
-                    .clone()
-                    .hour(12)
-                    .minute(0)
-                    .second(0)
-                    .toDate();
+                const sunDate = now.clone().hour(12).minute(0).second(0).toDate();
                 const sunCalcTimes = SunCalc.getTimes(sunDate, config.lat, config.lon);
                 const sunTime = sunCalcTimes[time];
                 if (sunTime) {
@@ -69,41 +61,47 @@ module.exports = function(RED) {
             if (!m) {
                 this.status({ fill: 'red', shape: 'dot', text: `Invalid time: ${time}` });
             }
+
             return m;
         };
 
-        this.on('input', msg => {
+        this.on('input', (msg) => {
             const now = this.now().milliseconds(0);
             const start = momentFor(config.startTime, now);
             if (config.startOffset) {
                 start.add(config.startOffset, 'minutes');
             }
+
             const end = momentFor(config.endTime, now);
             if (config.endOffset) {
                 end.add(config.endOffset, 'minutes');
             }
+
             // align end to be before AND within 24 hours of start
             while (end.diff(start, 'seconds') < 0) {
                 // end before start
                 end.add(1, 'day');
             }
+
             while (end.diff(start, 'seconds') > 86400) {
                 // end more than day before start
                 end.subtract(1, 'day');
             }
+
             // move start and end window to be within a day of now
             while (end.diff(now, 'seconds') < 0) {
                 // end before now
                 start.add(1, 'day');
                 end.add(1, 'day');
             }
+
             while (end.diff(now, 'seconds') > 86400) {
                 // end more than day from now
                 start.subtract(1, 'day');
                 end.subtract(1, 'day');
             }
 
-            const range = moment.range(start, end);
+            const range = Moment.range(start, end);
             const output = range.contains(now) ? 1 : 2;
             const msgs = [];
             msgs[output - 1] = msg;
@@ -111,12 +109,12 @@ module.exports = function(RED) {
             this.status({
                 fill: 'green',
                 shape: output === 1 ? 'dot' : 'ring',
-                text: `${start.format(fmt)} - ${end.format(fmt)}`
+                text: `${start.format(fmt)} - ${end.format(fmt)}`,
             });
         });
 
-        this.now = function() {
-            return moment();
+        this.now = function () {
+            return Moment();
         };
     });
 };
