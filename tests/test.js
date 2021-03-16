@@ -55,7 +55,7 @@ function runBetween(start, end, startOffset, endOffset) {
     const time = Moment('2016-01-01');
 
     node.now = function () {
-        return time.clone();
+        return time.clone().milliseconds(0);
     };
 
     for (let i = 0; i < 7 * 24; ++i) {
