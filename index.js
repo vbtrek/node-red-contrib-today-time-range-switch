@@ -31,11 +31,6 @@ module.exports = function (RED) {
     const Moment = MomentRange.extendMoment(require('moment'));
     const fmt = 'YYYY-MM-DD HH:mm';
 
-    const toBoolean = (val) => {
-        // eslint-disable-next-line prefer-template
-        return (val + '').toLowerCase() === 'true';
-    };
-
     const configuration = Object.freeze({
         startTime: String,
         startOffset: Number,
@@ -139,8 +134,8 @@ module.exports = function (RED) {
 
                 // Now try to work out if there was anything in the msg
                 // other that the standard _msgid. If there is, we'll
-                // send the message. Otherwise, we'll settle for updating
-                // the status.
+                // send the message. Otherwise, we assume that the msg
+                // was solely intended to change the configuration.
                 const keys = _.without(Object.keys(msg), '_msgid');
                 if (keys.length === 0) {
                     setInitialStatus();
@@ -165,6 +160,10 @@ module.exports = function (RED) {
 
         this.now = function () {
             return Moment().milliseconds(0);
+        };
+
+        this.getConfig = function () {
+            return config;
         };
 
         setInitialStatus();

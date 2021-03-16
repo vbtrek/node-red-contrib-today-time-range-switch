@@ -26,6 +26,7 @@
  */
 
 const Assert = require('assert');
+const _ = require('lodash');
 const Moment = require('moment');
 const Mock = require('node-red-contrib-mock-node');
 const NodeRedModule = require('../index.js');
@@ -68,8 +69,77 @@ function runBetween(start, end, startOffset, endOffset) {
 }
 
 describe('time-range-switch', function () {
-    // TODO - all these tests should assert the actual times rather than just the counts.
+    it('should accept programmatic configuration', function () {
+        const config = {
+            startTime: '12:35',
+            endTime: 'dusk',
+            startOffset: 0,
+            endOffset: 0,
+            lat: 51.33411,
+            lon: -0.83716,
+            unitTest: true,
+        };
 
+        const node = Mock(NodeRedModule, config);
+
+        Assert.deepStrictEqual(node.getConfig(), config);
+
+        node.emit('input', { payload: 'whatevs' });
+
+        Assert.deepStrictEqual(node.getConfig(), config);
+
+        const newConfig = {
+            startTime: '13:33',
+            endTime: 'night',
+            startOffset: 1,
+            endOffset: 2,
+            lat: 22.33333,
+            lon: -0.4589,
+            unitTest: true,
+        };
+
+        _.forIn(newConfig, (value, key) => {
+            config[key] = value;
+            node.emit('input', { __config: { [key]: '13:33' } });
+            Assert.deepStrictEqual(node.getConfig(), config);
+        });
+    });
+
+    it('should pass message after programmatic configuration', function () {
+        const config = {
+            startTime: '12:35',
+            endTime: 'dusk',
+            startOffset: 0,
+            endOffset: 0,
+            lat: 51.33411,
+            lon: -0.83716,
+            unitTest: true,
+        };
+
+        const node = Mock(NodeRedModule, config);
+        node.now = function () {
+            return Moment('2021-03-16T23:51:00').milliseconds(0);
+        };
+
+        Assert.deepStrictEqual(node.getConfig(), config);
+
+        config.startTime = '14:44';
+        node.emit('input', { __config: { startTime: '14:44' } });
+        Assert.deepStrictEqual(node.getConfig(), config);
+
+        Assert.strictEqual(node.sent().length, 0);
+
+        config.endTime = '15:55';
+        node.emit('input', { __config: { endTime: '15:55' }, payload: 'emit me' });
+        Assert.deepStrictEqual(node.getConfig(), config);
+
+        Assert.strictEqual(node.sent().length, 1);
+        const expected = [];
+        expected[1] = { payload: 'emit me' };
+        Assert.deepStrictEqual(node.sent(0), expected);
+    });
+
+    // TODO - all these tests should assert the actual times rather than just the counts.
     it('should work between 12:45...02:45', function () {
         const counts = runBetween('12:45', '02:45');
         Assert.strictEqual(98, counts.o1);
