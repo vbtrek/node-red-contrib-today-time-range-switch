@@ -69,6 +69,43 @@ function runBetween(start, end, startOffset, endOffset) {
 }
 
 describe('time-range-switch', function () {
+    it('should execute programmatic configuration', function (done) {
+        this.timeout(60000 * 3);
+        console.log(`\t[${this.test.title}] will take 120-ish seconds, please wait...`);
+
+        const node = Mock(NodeRedModule, {
+            startTime: '12:35',
+            endTime: 'dusk',
+            startOffset: 0,
+            endOffset: 0,
+            lat: 51.33411,
+            lon: -0.83716,
+            unitTest: true,
+        });
+
+        node.emit('input', {
+            __config: {
+                startTime: node.now().format('HH:mm'),
+                endTime: node.now().add(1, 'minute').format('HH:mm'),
+            },
+        });
+        Assert.strictEqual(node.sent().length, 0);
+
+        node.emit('input', { payload: 'expect output 1' });
+        Assert.strictEqual(node.sent().length, 1);
+        let expected = [];
+        expected[0] = { payload: 'expect output 1' };
+        Assert.deepStrictEqual(node.sent(0), expected);
+
+        setTimeout(function () {
+            node.emit('input', { payload: 'expect output 2' });
+            Assert.strictEqual(node.sent().length, 2);
+            expected = [];
+            expected[1] = { payload: 'expect output 2' };
+            Assert.deepStrictEqual(node.sent(1), expected);
+            done();
+        }, 122000);
+    });
     it('should accept programmatic configuration', function () {
         const config = {
             startTime: '12:35',
@@ -100,7 +137,7 @@ describe('time-range-switch', function () {
 
         _.forIn(newConfig, (value, key) => {
             config[key] = value;
-            node.emit('input', { __config: { [key]: '13:33' } });
+            node.emit('input', { __config: { [key]: value } });
             Assert.deepStrictEqual(node.getConfig(), config);
         });
     });
