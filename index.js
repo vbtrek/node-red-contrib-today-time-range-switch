@@ -135,7 +135,7 @@ module.exports = function (RED) {
                 // Now try to work out if there was anything in the msg
                 // other that the standard _msgid. If there is, we'll
                 // send the message. Otherwise, we assume that the msg
-                // was solely intended to change the configuration.
+                // was solely intended for us to change the configuration.
                 const keys = _.without(Object.keys(msg), '_msgid');
                 if (keys.length === 0) {
                     setInitialStatus();
