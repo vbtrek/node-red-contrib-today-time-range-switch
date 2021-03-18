@@ -44,6 +44,8 @@ The start and end time can have an offset. This is specified in minutes:
 
 This node can be controlled programmatically by sending configuration settings to the node input.
 
+**It is very important to note that properties set programmatically in this manner are transient. They will not persist over a NodeRED restart or redeploy!**
+
 E.g. send the following to the input:
 ```javascript
     msg.__config = {
