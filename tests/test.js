@@ -26,6 +26,7 @@
  */
 
 const Assert = require('assert');
+const _ = require('lodash');
 const Moment = require('moment');
 const Mock = require('node-red-contrib-mock-node');
 const NodeRedModule = require('../index.js');
@@ -55,7 +56,7 @@ function runBetween(start, end, startOffset, endOffset) {
     const time = Moment('2016-01-01');
 
     node.now = function () {
-        return time.clone();
+        return time.clone().milliseconds(0);
     };
 
     for (let i = 0; i < 7 * 24; ++i) {
@@ -68,8 +69,114 @@ function runBetween(start, end, startOffset, endOffset) {
 }
 
 describe('time-range-switch', function () {
-    // TODO - all these tests should assert the actual times rather than just the counts.
+    it('should execute programmatic configuration', function (done) {
+        this.timeout(60000 * 3);
+        console.log(`\t[${this.test.title}] will take 120-ish seconds, please wait...`);
 
+        const node = Mock(NodeRedModule, {
+            startTime: '12:35',
+            endTime: 'dusk',
+            startOffset: 0,
+            endOffset: 0,
+            lat: 51.33411,
+            lon: -0.83716,
+            unitTest: true,
+        });
+
+        node.emit('input', {
+            __config: {
+                startTime: node.now().format('HH:mm'),
+                endTime: node.now().add(1, 'minute').format('HH:mm'),
+            },
+        });
+        Assert.strictEqual(node.sent().length, 0);
+
+        node.emit('input', { payload: 'expect output 1' });
+        Assert.strictEqual(node.sent().length, 1);
+        let expected = [];
+        expected[0] = { payload: 'expect output 1' };
+        Assert.deepStrictEqual(node.sent(0), expected);
+
+        setTimeout(function () {
+            node.emit('input', { payload: 'expect output 2' });
+            Assert.strictEqual(node.sent().length, 2);
+            expected = [];
+            expected[1] = { payload: 'expect output 2' };
+            Assert.deepStrictEqual(node.sent(1), expected);
+            done();
+        }, 122000);
+    });
+    it('should accept programmatic configuration', function () {
+        const config = {
+            startTime: '12:35',
+            endTime: 'dusk',
+            startOffset: 0,
+            endOffset: 0,
+            lat: 51.33411,
+            lon: -0.83716,
+            unitTest: true,
+        };
+
+        const node = Mock(NodeRedModule, config);
+
+        Assert.deepStrictEqual(node.getConfig(), config);
+
+        node.emit('input', { payload: 'whatevs' });
+
+        Assert.deepStrictEqual(node.getConfig(), config);
+
+        const newConfig = {
+            startTime: '13:33',
+            endTime: 'night',
+            startOffset: 1,
+            endOffset: 2,
+            lat: 22.33333,
+            lon: -0.4589,
+            unitTest: true,
+        };
+
+        _.forIn(newConfig, (value, key) => {
+            config[key] = value;
+            node.emit('input', { __config: { [key]: value } });
+            Assert.deepStrictEqual(node.getConfig(), config);
+        });
+    });
+
+    it('should pass message after programmatic configuration', function () {
+        const config = {
+            startTime: '12:35',
+            endTime: 'dusk',
+            startOffset: 0,
+            endOffset: 0,
+            lat: 51.33411,
+            lon: -0.83716,
+            unitTest: true,
+        };
+
+        const node = Mock(NodeRedModule, config);
+        node.now = function () {
+            return Moment('2021-03-16T23:51:00').milliseconds(0);
+        };
+
+        Assert.deepStrictEqual(node.getConfig(), config);
+
+        config.startTime = '14:44';
+        node.emit('input', { __config: { startTime: '14:44' } });
+        Assert.deepStrictEqual(node.getConfig(), config);
+
+        Assert.strictEqual(node.sent().length, 0);
+
+        config.endTime = '15:55';
+        node.emit('input', { __config: { endTime: '15:55' }, payload: 'emit me' });
+        Assert.deepStrictEqual(node.getConfig(), config);
+
+        Assert.strictEqual(node.sent().length, 1);
+        const expected = [];
+        expected[1] = { payload: 'emit me' };
+        Assert.deepStrictEqual(node.sent(0), expected);
+    });
+
+    // TODO - all these tests should assert the actual times rather than just the counts.
     it('should work between 12:45...02:45', function () {
         const counts = runBetween('12:45', '02:45');
         Assert.strictEqual(98, counts.o1);

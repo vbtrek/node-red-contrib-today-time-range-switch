@@ -26,9 +26,19 @@
 module.exports = function (RED) {
     const SunCalc = require('suncalc2');
     const MomentRange = require('moment-range');
+    const _ = require('lodash');
 
     const Moment = MomentRange.extendMoment(require('moment'));
     const fmt = 'YYYY-MM-DD HH:mm';
+
+    const configuration = Object.freeze({
+        startTime: String,
+        startOffset: Number,
+        endTime: String,
+        endOffset: Number,
+        lon: Number,
+        lat: Number,
+    });
 
     RED.nodes.registerType('time-range-switch', function (config) {
         RED.nodes.createNode(this, config);
@@ -65,8 +75,7 @@ module.exports = function (RED) {
             return m;
         };
 
-        this.on('input', (msg) => {
-            const now = this.now().milliseconds(0);
+        const calculateStartAndEnd = (now) => {
             const start = momentFor(config.startTime, now);
             if (config.startOffset) {
                 start.add(config.startOffset, 'minutes');
@@ -101,11 +110,47 @@ module.exports = function (RED) {
                 end.subtract(1, 'day');
             }
 
+            return { start, end };
+        };
+
+        const setInitialStatus = () => {
+            const { start, end } = calculateStartAndEnd(this.now());
+            this.status({
+                fill: 'yellow',
+                shape: 'dot',
+                text: `${start.format(fmt)} - ${end.format(fmt)}`,
+            });
+        };
+
+        this.on('input', (msg) => {
+            if (msg.__config) {
+                _.forIn(configuration, (typeConverter, prop) => {
+                    if (Object.prototype.hasOwnProperty.call(msg.__config, prop)) {
+                        config[prop] = typeConverter(msg.__config[prop]);
+                    }
+                });
+
+                delete msg.__config;
+
+                // Now try to work out if there was anything in the msg
+                // other that the standard _msgid. If there is, we'll
+                // send the message. Otherwise, we assume that the msg
+                // was solely intended for us to change the configuration.
+                const keys = _.without(Object.keys(msg), '_msgid');
+                if (keys.length === 0) {
+                    setInitialStatus();
+                    return;
+                }
+            }
+
+            const now = this.now();
+            const { start, end } = calculateStartAndEnd(now);
             const range = Moment.range(start, end);
             const output = range.contains(now) ? 1 : 2;
             const msgs = [];
             msgs[output - 1] = msg;
             this.send(msgs);
+
             this.status({
                 fill: 'green',
                 shape: output === 1 ? 'dot' : 'ring',
@@ -114,7 +159,13 @@ module.exports = function (RED) {
         });
 
         this.now = function () {
-            return Moment();
+            return Moment().milliseconds(0);
         };
+
+        this.getConfig = function () {
+            return config;
+        };
+
+        setInitialStatus();
     });
 };
