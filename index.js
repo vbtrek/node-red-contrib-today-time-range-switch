@@ -146,7 +146,7 @@ module.exports = function (RED) {
             const now = this.now();
             const { start, end } = calculateStartAndEnd(now);
             const range = Moment.range(start, end);
-            const output = range.contains(now, { excludeEnd: true; }) ? 1 : 2;
+            const output = range.contains(now, { excludeEnd: true }) ? 1 : 2;
             const msgs = [];
             msgs[output - 1] = msg;
             this.send(msgs);
