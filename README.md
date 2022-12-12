@@ -17,7 +17,8 @@ The times can be a 24 hour time or a [suncalc](https://github.com/mourner/suncal
 
 | Time        | Description                                                              |
 | --------------- | ------------------------------------------------------------------------ |
-| `00:00 ... 23:59`       | 24hr time                     |
+| `00:00 ... 23:59` | 24hr time in hours and minutes                                   |
+| `00:00:03 ... 23:59:13` | 24hr time in hours minutes and seconds                     |
 | `sunrise`       | sunrise (top edge of the sun appears on the horizon)                     |
 | `sunriseEnd`    | sunrise ends (bottom edge of the sun touches the horizon)                |
 | `goldenHourEnd` | morning golden hour (soft light, best time for photography) ends         |

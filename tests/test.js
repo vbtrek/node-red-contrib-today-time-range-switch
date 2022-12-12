@@ -260,7 +260,7 @@ describe('time-range-switch', function () {
         ];
 
         const node = Mock(NodeRedModule, {
-            startTime: '22:00',
+            startTime: '22:00:30',
             endTime: '06:00',
             lat: 48.2205998,
             lon: 16.239978,
