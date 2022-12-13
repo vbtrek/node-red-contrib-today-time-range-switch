@@ -74,7 +74,7 @@ describe('time-range-switch', function () {
         console.log(`\t[${this.test.title}] will take 120-ish seconds, please wait...`);
 
         const node = Mock(NodeRedModule, {
-            startTime: '12:35',
+            startTime: '12:35:13',
             endTime: 'dusk',
             startOffset: 0,
             endOffset: 0,
@@ -260,7 +260,7 @@ describe('time-range-switch', function () {
         ];
 
         const node = Mock(NodeRedModule, {
-            startTime: '22:00:30',
+            startTime: '22:00',
             endTime: '06:00',
             lat: 48.2205998,
             lon: 16.239978,
