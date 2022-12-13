@@ -85,28 +85,6 @@ module.exports = function (RED) {
             for (let i = 0; i < timeMatchers.length && m == null; ++i) {
                 m = timeMatchers[i](time, now, config);
             }
-            // const matches = new RegExp(/(\d+):(\d+)/).exec(time);
-            // if (matches && matches.length) {
-            //     m = now.clone().hour(matches[1]).minute(matches[2]).second(0);
-            // } else {
-            //     // Schedex#57 Suncalc appears to give the best results if you
-            //     // calculate at midday.
-            //     const sunDate = now.clone().hour(12).minute(0).second(0).toDate();
-            //     const sunCalcTimes = SunCalc.getTimes(sunDate, config.lat, config.lon);
-            //     const sunTime = sunCalcTimes[time];
-            //     if (sunTime) {
-            //         // Schedex#57 Nadir appears to work differently to other sun times
-            //         // in that it will calculate tomorrow's nadir if the time is
-            //         // too close to today's nadir. So we just take the time and
-            //         // apply that to the event's moment. That's doesn't yield a
-            //         // perfect suntime but it's close enough.
-            //         m = now
-            //             .clone()
-            //             .hour(sunTime.getHours())
-            //             .minute(sunTime.getMinutes())
-            //             .second(sunTime.getSeconds());
-            //     }
-            // }
 
             if (!m) {
                 this.status({ fill: 'red', shape: 'dot', text: `Invalid time: ${time}` });
