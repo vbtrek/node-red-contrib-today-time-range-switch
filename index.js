@@ -77,7 +77,7 @@ module.exports = function (RED) {
         },
     ];
 
-    RED.nodes.registerType('time-range-switch', function (config) {
+    RED.nodes.registerType('today-time-range-switch', function (config) {
         RED.nodes.createNode(this, config);
 
         const momentFor = (time, now) => {

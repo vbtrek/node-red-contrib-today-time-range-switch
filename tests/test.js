@@ -68,7 +68,7 @@ function runBetween(start, end, startOffset, endOffset) {
     return counts;
 }
 
-describe('time-range-switch', function () {
+describe('today-time-range-switch', function () {
     it('should execute programmatic configuration', function (done) {
         this.timeout(60000 * 3);
         console.log(`\t[${this.test.title}] will take 120-ish seconds, please wait...`);
