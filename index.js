@@ -105,28 +105,28 @@ module.exports = function (RED) {
             }
 
             // align end to be before AND within 24 hours of start
-            while (end.diff(start, 'seconds') < 0) {
+//            while (end.diff(start, 'seconds') < 0) {
                 // end before start
-                end.add(1, 'day');
-            }
+//                end.add(1, 'day');
+//            }
 
-            while (end.diff(start, 'seconds') > 86400) {
+//            while (end.diff(start, 'seconds') > 86400) {
                 // end more than day before start
-                end.subtract(1, 'day');
-            }
+//                end.subtract(1, 'day');
+//            }
 
             // move start and end window to be within a day of now
-            while (end.diff(now, 'seconds') < 0) {
+//            while (end.diff(now, 'seconds') < 0) {
                 // end before now
-                start.add(1, 'day');
-                end.add(1, 'day');
-            }
+//                start.add(1, 'day');
+//                end.add(1, 'day');
+//            }
 
-            while (end.diff(now, 'seconds') > 86400) {
+//            while (end.diff(now, 'seconds') > 86400) {
                 // end more than day from now
-                start.subtract(1, 'day');
-                end.subtract(1, 'day');
-            }
+//                start.subtract(1, 'day');
+//                end.subtract(1, 'day');
+//            }
 
             return { start, end };
         };
@@ -170,7 +170,7 @@ module.exports = function (RED) {
             this.send(msgs);
 
             this.status({
-                fill: 'green',
+                fill: output === 1 ? 'green' : 'red',
                 shape: output === 1 ? 'dot' : 'ring',
                 text: `${start.format(fmt)} - ${end.format(fmt)}`,
             });
