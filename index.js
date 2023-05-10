@@ -29,7 +29,7 @@ module.exports = function (RED) {
     const _ = require('lodash');
 
     const Moment = MomentRange.extendMoment(require('moment'));
-    const fmt = 'YYYY-MM-DD HH:mm';
+    const fmt = 'HH:mm';
 
     const configuration = Object.freeze({
         startTime: String,
@@ -165,6 +165,16 @@ module.exports = function (RED) {
             const { start, end } = calculateStartAndEnd(now);
             const range = Moment.range(start, end);
             const output = range.contains(now, { excludeEnd: true }) ? 1 : 2;
+
+            const message = output === 1 ? 'within' : 'outside';
+
+            msg.todayTimeRange = {
+                dateTimeTested: now,
+                start: start,
+                end: end,
+                status: message
+            };
+
             const msgs = [];
             msgs[output - 1] = msg;
             this.send(msgs);
@@ -172,7 +182,7 @@ module.exports = function (RED) {
             this.status({
                 fill: output === 1 ? 'green' : 'red',
                 shape: output === 1 ? 'dot' : 'ring',
-                text: `${start.format(fmt)} - ${end.format(fmt)}`,
+                text: `${message}: ${start.format(fmt)}-${end.format(fmt)}`,
             });
         });
 

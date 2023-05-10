@@ -6,6 +6,10 @@
 
 [My npm Packages](https://www.npmjs.com/settings/dereksmith/packages)
 
+## Useful Help
+
+[Create Nodes](https://nodered.org/docs/creating-nodes/)
+
 
 ## Build
 

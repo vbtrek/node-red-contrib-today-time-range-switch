@@ -3,6 +3,7 @@
 A simple Node-RED node that routes messages depending on the time. If the current time falls within the range specified
 in the node configuration, the message is routed to output 1. Otherwise the message is routed to output 2.
 
+The key difference between this node and ```node-red-contrib-time-range-switch``` is that the dates are not corrected, so if you set a time range like ```06:00``` to ```sunrise```, if sunrise happens to be before 6AM this node will not roll the date forward a day. Additionally, extra info is attached to the msg object to aid debugging.
 
 ### Installation
  
