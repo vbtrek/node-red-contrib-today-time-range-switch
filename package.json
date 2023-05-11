@@ -15,7 +15,7 @@
         "test": "nyc --reporter=html mocha -R spec ./tests/test.js",
         "update-dependencies": "./node_modules/.bin/ncu -u && npm install",
         "lint": "eslint .",
-        "postpublish": "start https://flows.nodered.org/add/node"
+        "postpublish": "start https://flows.nodered.org/add/node && @powershell Set-Clipboard -Value 'node-red-contrib-today-time-range-switch'"
     },
     "author": "@vbtrek",
     "license": "MIT",
