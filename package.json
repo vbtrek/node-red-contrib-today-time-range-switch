@@ -14,7 +14,8 @@
         "start": "mkdir -p .node-red/node_modules && ln -sf $PWD $PWD/.node-red/node_modules/node-red-contrib-schedex && node-red -u .node-red",
         "test": "nyc --reporter=html mocha -R spec ./tests/test.js",
         "update-dependencies": "./node_modules/.bin/ncu -u && npm install",
-        "lint": "eslint ."
+        "lint": "eslint .",
+        "postpublish": "start https://flows.nodered.org/add/node"
     },
     "author": "@vbtrek",
     "license": "MIT",
